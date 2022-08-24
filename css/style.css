@@ -31,14 +31,16 @@ body{
 .playground > ul > li{
     width: 100%;
     height: 25px;
-}
-
-.playground > ul > li > ul {
     display: flex;
 }
 
-.playground > ul > li > ul > li {
+.playground > ul > li > div {
     width: 25px;
     height: 25px;
     outline: 1px solid #ccc;
+}
+
+/* blocks */
+.tree{
+    background: #67c23a;
 }
