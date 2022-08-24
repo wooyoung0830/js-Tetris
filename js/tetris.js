@@ -47,10 +47,45 @@ function tetrisFrame(){
 
 function renderBlocks(){
     const {type, direction, top, left} = tempMovingItem;
-    blocks[type][direction].forEach(block => {
+    // 이동 전 block 지우기
+    const movingBlocks = document.querySelectorAll(".moving")
+    movingBlocks.forEach((block)=> {
+        block.classList.remove(type, "moving")
+    })
+    // 이동 후 block 새로 그리기
+    blocks[type][direction].forEach((block) => {
         const x = block[0] + left;
         const y = block[1] + top;
-        const target = playground.childNodes[y].childNodes[x];
-        target.classList.add(type)
+        const target = playground.childNodes[y].childNodes[x]
+        target.classList.add(type, "moving")
     });
 }
+
+function moveBlock(moveDirection, amount){
+    tempMovingItem[moveDirection] += amount;
+    renderBlocks()
+}
+
+function checkEmpty(target){
+    if(target){
+        return true
+    }else{
+        return false
+    }
+}
+// event handling
+document.addEventListener("keydown", (event) => {
+    switch(event.keyCode){
+        case 39:
+            moveBlock("left", 1);
+            break;
+        case 37:
+            moveBlock("left", -1);
+            break;
+        case 40:
+            moveBlock("top", 1);
+            break;
+        default:
+            break
+    }
+})
