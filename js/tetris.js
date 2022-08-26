@@ -56,9 +56,27 @@ function renderBlocks(){
     blocks[type][direction].forEach((block) => {
         const x = block[0] + left;
         const y = block[1] + top;
-        const target = playground.childNodes[y].childNodes[x]
-        target.classList.add(type, "moving")
+        const target = playground.childNodes[y] ? playground.childNodes[y].childNodes[x] : null;
+        const isAvailable = checkTarget(target)
+        if(isAvailable){
+            target.classList.add(type, "moving")
+        }else{
+            tempMovingItem = {...movingItem} // 원상복구
+            setTimeout(() => { // block이 frame을 벗어나면 다시 renderBlocks()
+                renderBlocks();
+                // if(){
+                //     seizeBlock(); // 더이상 아래로 내려가지 못하면 움직이지 못하고 형태만 남음
+                // }
+            },0)
+        }
     });
+    movingItem.left = left,
+    movingItem.top = top, 
+    movingItem.direction = direction
+}
+
+function seizeBlock(){
+    console.log("seize")
 }
 
 function moveBlock(moveDirection, amount){
@@ -66,10 +84,10 @@ function moveBlock(moveDirection, amount){
     renderBlocks()
 }
 
-function checkEmpty(target){
-    if(target){
+function checkTarget(target){
+    if(target != null){ // target이 있으면
         return true
-    }else{
+    }else{ // target이 업으면
         return false
     }
 }
