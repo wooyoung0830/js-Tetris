@@ -1,3 +1,5 @@
+import blocks from "./blocks.js"
+
 const playground = document.querySelector(".playground > ul")
 
 const game_rows = 20;
@@ -8,17 +10,8 @@ let downDuration = 500; // 블럭이 떨어지는 시간
 let downInterval; // 다음 블럭이 떨어지는 간격
 let tempMovingItem;
 
-const blocks = {
-    tree : [ // ㅗ 모양
-        [[2,1],[0,1],[1,0],[1,1]], // 기본
-        [[1,2],[0,1],[1,0],[1,1]], // 왼쪽 90도
-        [[1,2],[0,1],[2,1],[1,1]],
-        [[1,2],[2,1],[1,0],[1,1]],
-    ]
-}
-
 const movingItem = {
-    type : "tree",
+    type : "corner",
     direction : 0,
     top : 0,
     left : 0,
@@ -53,7 +46,8 @@ function renderBlocks(moveType=""){
         block.classList.remove(type, "moving")
     })
     // 이동 후 block 새로 그리기
-    blocks[type][direction].forEach((block) => {
+    // some() 배열 안 요소가 주어진 함수를 통과하면 true, 배열이 비어있으면 false
+    blocks[type][direction].some((block) => {
         const x = block[0] + left;
         const y = block[1] + top;
         const target = playground.childNodes[y] ? playground.childNodes[y].childNodes[x] : null;
@@ -68,6 +62,7 @@ function renderBlocks(moveType=""){
                     seizeBlock(); // 더이상 아래로 내려가지 못하면 움직이지 못하고 형태만 남음
                 }
             },0)
+            return true;
         }
     });
     movingItem.left = left,
@@ -75,12 +70,24 @@ function renderBlocks(moveType=""){
     movingItem.direction = direction
 }
 
+function generateNewBlock(){
+    const blockArray = Object.entries(blocks);
+    const randomIndex = parseInt(Math.random() * blockArray.length);
+    movingItem.type = blockArray[randomIndex][0]
+    movingItem.top = 0;
+    movingItem.left = 3;
+    movingItem.direction = 2;
+    tempMovingItem = {...movingItem};
+    renderBlocks()
+}
+
 function seizeBlock(){
-    const movingBlocks = document.querySelectorAll(".moving")
+    const movingBlocks = document.querySelectorAll(".moving") 
     movingBlocks.forEach((block)=> {
         block.classList.remove("moving");
         block.classList.add("seized");
     })
+    generateNewBlock()
 }
 
 function moveBlock(moveType, amount){
