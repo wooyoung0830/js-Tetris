@@ -1,17 +1,26 @@
 import blocks from "./blocks.js"
 
-const playground = document.querySelector(".playground > ul")
+document.querySelector(".gameOver").addEventListener('click', () => {
+    clearInterval(downInterval)
+    alert("게임이 끝났습니다.")})
 
+document.querySelector(".re-start").addEventListener('click', () => {
+    location.reload()})
+    
+
+const playground = document.querySelector(".playground > ul")
 const game_rows = 20;
 const game_columns = 10;
 
+
 let score = 0;
+
+
 let downDuration = 500; // 블럭이 떨어지는 시간
 let downInterval; // 다음 블럭이 떨어지는 간격
 let tempMovingItem;
-
 const movingItem = {
-    type : "corner",
+    type : "",
     direction : 0,
     top : 0,
     left : 0,
@@ -24,7 +33,7 @@ function init(){
     for (let i = 0; i<game_rows; i++){
         tetrisFrame()
     }
-    renderBlocks()
+    generateNewBlock()
 }
 
 function tetrisFrame(){
@@ -71,6 +80,10 @@ function renderBlocks(moveType=""){
 }
 
 function generateNewBlock(){
+    clearInterval(downInterval);
+    downInterval = setInterval(() => {
+        moveBlock("top", 1); // 자동으로 🔽
+    },downDuration)
     const blockArray = Object.entries(blocks);
     const randomIndex = parseInt(Math.random() * blockArray.length);
     movingItem.type = blockArray[randomIndex][0]
@@ -86,6 +99,25 @@ function seizeBlock(){
     movingBlocks.forEach((block)=> {
         block.classList.remove("moving");
         block.classList.add("seized");
+    })
+    checkMatch()
+}
+
+function checkMatch(){ // 한 줄이 다 차면 삭제
+    const childNodes = playground.childNodes;
+    childNodes.forEach((child) => {
+        let match = true;
+        child.childNodes.forEach((div) => {
+            if(!div.classList.contains("seized")){
+                match = false;
+            }
+        })
+        if(match){
+            child.remove();
+            score = score+1;
+            document.querySelector(".score").innerHTML = score;
+            tetrisFrame();
+        }
     })
     generateNewBlock()
 }
@@ -109,6 +141,13 @@ function rotateDirection(){
     renderBlocks();
 }
 
+function dropBlock(){
+    clearInterval(downInterval);
+    downInterval = setInterval(() => {
+        moveBlock("top", 1);
+    },10)
+}
+
 // event handling
 document.addEventListener("keydown", (event) => {
     switch(event.keyCode){
@@ -125,6 +164,10 @@ document.addEventListener("keydown", (event) => {
         // rotate
         case 38: // 🔼
             rotateDirection();
+            break;
+        // spaceBar
+        case 32:
+            dropBlock();
             break;
         default:
             break
