@@ -76,7 +76,11 @@ function renderBlocks(moveType=""){
 }
 
 function seizeBlock(){
-    console.log("seize")
+    const movingBlocks = document.querySelectorAll(".moving")
+    movingBlocks.forEach((block)=> {
+        block.classList.remove("moving");
+        block.classList.add("seized");
+    })
 }
 
 function moveBlock(moveType, amount){
@@ -85,7 +89,7 @@ function moveBlock(moveType, amount){
 }
 
 function checkTarget(target){
-    if(target != null){ // target이 있으면
+    if(target != null && !target.classList.contains("seized")){ // target이 있으면
         return true
     }else{ // target이 업으면
         return false
