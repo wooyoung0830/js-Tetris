@@ -11,9 +11,9 @@ let tempMovingItem;
 const blocks = {
     tree : [ // ㅗ 모양
         [[2,1],[0,1],[1,0],[1,1]], // 기본
-        [], // 왼쪽 90도
-        [],
-        [],
+        [[1,2],[0,1],[1,0],[1,1]], // 왼쪽 90도
+        [[1,2],[0,1],[2,1],[1,1]],
+        [[1,2],[2,1],[1,0],[1,1]],
     ]
 }
 
@@ -45,7 +45,7 @@ function tetrisFrame(){
     playground.prepend(li)
 }
 
-function renderBlocks(){
+function renderBlocks(moveType=""){
     const {type, direction, top, left} = tempMovingItem;
     // 이동 전 block 지우기
     const movingBlocks = document.querySelectorAll(".moving")
@@ -64,9 +64,9 @@ function renderBlocks(){
             tempMovingItem = {...movingItem} // 원상복구
             setTimeout(() => { // block이 frame을 벗어나면 다시 renderBlocks()
                 renderBlocks();
-                // if(){
-                //     seizeBlock(); // 더이상 아래로 내려가지 못하면 움직이지 못하고 형태만 남음
-                // }
+                if(moveType === "top"){
+                    seizeBlock(); // 더이상 아래로 내려가지 못하면 움직이지 못하고 형태만 남음
+                }
             },0)
         }
     });
@@ -79,9 +79,9 @@ function seizeBlock(){
     console.log("seize")
 }
 
-function moveBlock(moveDirection, amount){
-    tempMovingItem[moveDirection] += amount;
-    renderBlocks()
+function moveBlock(moveType, amount){
+    tempMovingItem[moveType] += amount;
+    renderBlocks(moveType)
 }
 
 function checkTarget(target){
@@ -91,17 +91,29 @@ function checkTarget(target){
         return false
     }
 }
+
+function rotateDirection(){
+    const direction = tempMovingItem.direction;
+    direction === 3 ? tempMovingItem.direction = 0 : tempMovingItem.direction+=1
+    renderBlocks();
+}
+
 // event handling
 document.addEventListener("keydown", (event) => {
     switch(event.keyCode){
-        case 39:
+        // moving
+        case 39: // ◀
             moveBlock("left", 1);
             break;
-        case 37:
+        case 37: // ▶
             moveBlock("left", -1);
             break;
-        case 40:
+        case 40: // 🔽
             moveBlock("top", 1);
+            break;
+        // rotate
+        case 38: // 🔼
+            rotateDirection();
             break;
         default:
             break
